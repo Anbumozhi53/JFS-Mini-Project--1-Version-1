@@ -1,0 +1,36 @@
+<form id="empForm">
+  <input id="firstName" placeholder="First Name">
+  <input id="lastName" placeholder="Last Name">
+  <input id="email" placeholder="Email">
+  <button type="submit">Add Employee</button>
+</form>
+
+<table id="empTable"></table>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document.getElementById("empForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    axios.post("/api/employees", {
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      email: document.getElementById("email").value
+    }).then(() => window.location.reload());
+  });
+
+  window.onload = () => {
+    axios.get("/api/employees").then(res => {
+      const rows = res.data.map(emp => `<tr>
+        <td>${emp.firstName}</td>
+        <td>${emp.lastName}</td>
+        <td>${emp.email}</td>
+        <td><button onclick="deleteEmp(${emp.id})">Delete</button></td>
+      </tr>`);
+      document.getElementById("empTable").innerHTML = rows.join('');
+    });
+  };
+
+  function deleteEmp(id) {
+    axios.delete(`/api/employees/${id}`).then(() => window.location.reload());
+  }
+</script>
